@@ -1,18 +1,27 @@
 import { useState } from "react";
+import { useEffect } from "react";
+import axios from "axios";
 
 const App = () => {
-  const [persons, setPersons] = useState([
+  const [allPersons, setAllPersons] = useState([
     { name: "Arto Hellas", id: "Arto Hellas", number: "9832323322" },
   ]);
   const [newName, setNewName] = useState("");
+
   const [newNumber, setNewNumber] = useState("");
   const [filterby, setFilterby] = useState("");
+  const [persons, setPersons] = useState(allPersons);
 
-  let temp = persons;
+  useEffect(() => {
+    axios
+      .get("http://localhost:3001/persons")
+      .then((res) => setAllPersons(res.data));
+  }, []);
   const handleFilter = function (e) {
+    let temp = persons;
     console.log(e.target.value);
     setFilterby(e.target.value);
-    const toShow = temp.filter((p) => p.name.includes(e.target.value));
+    const toShow = persons.filter((p) => p.name.includes(e.target.value));
 
     setPersons(toShow);
   };
@@ -38,7 +47,7 @@ const App = () => {
       number: newNumber,
     };
 
-    setPersons(persons.concat(personObject));
+    setAllPersons(allPersons.concat(personObject));
   };
   return (
     <div>
@@ -60,7 +69,7 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-      {persons.map((p) => (
+      {allPersons.map((p) => (
         <div key={p.id}>
           <p>
             {p.name} {p.number}
