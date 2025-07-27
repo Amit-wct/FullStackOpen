@@ -13,10 +13,16 @@ const App = () => {
     const note = notes.find((n) => n.id == id);
     const changedNote = { ...note, important: !note.important };
 
-    noteService.update(id, changedNote).then((res) => {
-      console.log(res);
-      setNotes(notes.map((note) => (note.id === id ? res : note)));
-    });
+    noteService
+      .update(id, changedNote)
+      .then((res) => {
+        console.log(res);
+        setNotes(notes.map((note) => (note.id === id ? res : note)));
+      })
+      .catch((error) => {
+        alert(`the note '${note.content}' was already deleted from server`);
+        setNotes(notes.filter((n) => n.id !== id));
+      });
     console.log("importance of " + id + " needs to be toggled");
   };
 

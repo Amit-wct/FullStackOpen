@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
+import personsService from "./services/persons";
 
 const App = () => {
   const [allPersons, setAllPersons] = useState([
@@ -13,9 +14,7 @@ const App = () => {
   const [persons, setPersons] = useState(allPersons);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then((res) => setAllPersons(res.data));
+    personsService.getAll().then((res) => setAllPersons(res));
   }, []);
   const handleFilter = function (e) {
     let temp = persons;
@@ -34,20 +33,47 @@ const App = () => {
   };
   const handleAddContact = function (e) {
     e.preventDefault();
-    if (persons.map((p) => p.name).includes(newName)) {
-      console.log("why");
-      alert(`${newName} arleady exists`);
-      return;
-    }
+    console.log("why not ", newName);
 
-    console.log(e.target);
     const personObject = {
       name: newName,
       id: newName,
       number: newNumber,
     };
 
-    setAllPersons(allPersons.concat(personObject));
+    if (allPersons.map((p) => p.name).includes(newName)) {
+      console.log("why");
+
+      const cfm = window.confirm(
+        `${newName} arleady exists want to update his number`
+      );
+      if (cfm) {
+        personsService
+          .update(personObject)
+          .then((res) =>
+            setAllPersons(allPersons.map((p) => (p.id == newName ? res : p)))
+          );
+      }
+      return;
+    }
+
+    personsService.create(personObject).then((res) => {
+      console.log(res);
+      setAllPersons(allPersons.concat(personObject));
+    });
+  };
+
+  const handleDelete = function (id) {
+    console.log("lets delete ", id);
+
+    const confirmation = window.confirm("are you sure want to delete", id);
+    if (confirmation) {
+      personsService.remove(id).then((res) => {
+        console.log(res);
+        const person = allPersons.filter((p) => p.id !== id);
+        setAllPersons(person);
+      });
+    }
   };
   return (
     <div>
@@ -72,7 +98,14 @@ const App = () => {
       {allPersons.map((p) => (
         <div key={p.id}>
           <p>
-            {p.name} {p.number}
+            {p.name} {p.number}{" "}
+            <button
+              onClick={() => {
+                handleDelete(p.id);
+              }}
+            >
+              delete
+            </button>
           </p>
         </div>
       ))}
