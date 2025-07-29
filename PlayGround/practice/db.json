@@ -19,16 +19,6 @@
       "id": "7",
       "content": "this is also note a new note",
       "important": false
-    },
-    {
-      "id": "5",
-      "content": "and here it goes",
-      "important": true
-    },
-    {
-      "id": "6",
-      "content": "so what",
-      "important": false
     }
   ]
 }
