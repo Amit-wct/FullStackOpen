@@ -5,10 +5,10 @@ import { useState, useEffect } from "react";
 import noteService from "./services/notes";
 import Notification from "./components/Notification";
 const App = () => {
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState(null);
   const [newNote, setNewNote] = useState("");
   const [showAll, setShowAll] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("Some error");
+  const [errorMessage, setErrorMessage] = useState(null);
   const toggleImportanceOf = (id) => {
     const note = notes.find((n) => n.id == id);
     const changedNote = { ...note, important: !note.important };
@@ -43,7 +43,7 @@ const App = () => {
       setNotes(res);
     });
   }, []);
-  console.log("render", notes.length, "notes");
+  // console.log("render", notes.length, "notes");
 
   console.log(noteToShow);
   const addNote = function (e) {
@@ -66,6 +66,10 @@ const App = () => {
     console.log(e.target);
     setNewNote(e.target.value);
   };
+
+  if (!notes) { 
+    return null 
+  }
 
   return (
     <div>
@@ -100,3 +104,5 @@ const App = () => {
 };
 
 export default App;
+
+

@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
 import personsService from "./services/persons";
+import Notification from "./Components/Notification";
 
 const App = () => {
   const [allPersons, setAllPersons] = useState([
     { name: "Arto Hellas", id: "Arto Hellas", number: "9832323322" },
   ]);
   const [newName, setNewName] = useState("");
-
+  const [errorMessage, setErrorMessage] = useState(null)
   const [newNumber, setNewNumber] = useState("");
   const [filterby, setFilterby] = useState("");
   const [persons, setPersons] = useState(allPersons);
@@ -50,8 +51,11 @@ const App = () => {
       if (cfm) {
         personsService
           .update(personObject)
-          .then((res) =>
-            setAllPersons(allPersons.map((p) => (p.id == newName ? res : p)))
+          .then((res) =>{
+              setAllPersons(allPersons.map((p) => (p.id == newName ? res : p)));
+              setErrorMessage(`updated ${newName}'s number successfully`)
+              setTimeout(()=>{setErrorMessage(null)},5000)
+          }
           );
       }
       return;
@@ -59,6 +63,8 @@ const App = () => {
 
     personsService.create(personObject).then((res) => {
       console.log(res);
+      setErrorMessage(`Added ${newName} to phonebook successfully`)
+      setTimeout(()=>{setErrorMessage(null)},5000)
       setAllPersons(allPersons.concat(personObject));
     });
   };
@@ -72,11 +78,20 @@ const App = () => {
         console.log(res);
         const person = allPersons.filter((p) => p.id !== id);
         setAllPersons(person);
+      }).catch((e)=>{
+        setErrorMessage("this person is already deleted from server");
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000);
+        const person = allPersons.filter((p) => p.id !== id);
+      setAllPersons(person);
+                            
       });
     }
   };
   return (
     <div>
+      <Notification message={errorMessage}/>
       <h2>Phonebook</h2>
       <div>
         <p>Filter shown with</p>
